@@ -23,6 +23,30 @@ public class ProductRepositoryTest {
     }
 
     @Test
+    public void shouldSaveProduct() {
+        ProductRepository repo = new ProductRepository();
+        repo.save(product1);
+
+        Product[] expected = {product1};
+        Product[] actual = repo.getProducts();
+
+        Assertions.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldNotSaveProductIfIdIsAlreadyExist() {
+        ProductRepository repo = new ProductRepository();
+        repo.save(product1);
+        repo.save(product2);
+        repo.save(product3);
+        repo.save(product4);
+
+        Assertions.assertThrows(AlreadyExistsException.class, () -> {
+            repo.save(product2);
+        });
+    }
+
+    @Test
     public void shouldRemoveProductsById() {
         ProductRepository repo = new ProductRepository();
         repo.save(product1);
@@ -38,16 +62,18 @@ public class ProductRepositoryTest {
     }
 
     @Test
-    public void shouldAddAllProducts() {
+    public void shouldNotRemoveNotExistingProductsById() {
         ProductRepository repo = new ProductRepository();
         repo.save(product1);
         repo.save(product2);
         repo.save(product3);
         repo.save(product4);
 
-        Product[] expected = {product1, product2, product3, product4};
-        Product[] actual = repo.findAll();
-
-        Assertions.assertArrayEquals(expected, actual);
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            repo.removeById(20);
+        });
     }
 }
+
+
+
